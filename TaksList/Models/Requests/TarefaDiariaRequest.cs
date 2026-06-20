@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Primitives;
 using TaksList.Enuns;
+using TaksList.Models.Classes;
 
-namespace TaksList.Métodos
+namespace TaksList.Models.Requests
 {
     public class TarefaDiariaRequest
     {
@@ -10,6 +11,8 @@ namespace TaksList.Métodos
         public List<DiasSemana> dias {  get; set; }
         public TimeSpan? horario { get; set; }
         public StatusTarefa status { get; internal set; }
+
+        public int userId { get; set; }
     }
 
 

@@ -1,4 +1,4 @@
-﻿namespace TaksList.Services
+﻿namespace TaksList.Models.Requests
 {
     public class TarefaAgendaRequest
     {
@@ -8,7 +8,7 @@
 
         public int previsaoConclusao { get; set; }
 
-
+        public int userId { get; set; }
 
     }
 }

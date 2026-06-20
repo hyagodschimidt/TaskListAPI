@@ -1,14 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
-using TaksList.Classes;
-using TaksList.Métodos;
+using TaksList.Data;
+using TaksList.Models.Classes;
+using TaksList.Models.Requests;
 using TaksList.Services;
 
 namespace TaksList.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+
+
     public class TarefaController : ControllerBase
     {
+        private readonly AppDbContext _db;
+
+        public TarefaController(AppDbContext db)
+        {
+            _db = db;
+        }
+
         [HttpPost("diarias")]
         public IActionResult CriaTarefa([FromBody] TarefaDiariaRequest request)
         {
@@ -18,9 +28,11 @@ namespace TaksList.Controllers
                 description = request.description,
                 dias = request.dias,
                 horario = request.horario,
-                status = Enuns.StatusTarefa.EmAndamento
+                status = Enuns.StatusTarefa.EmAndamento,
+                serId = request.userId
             };
-            AdicionarTarefa.AdicionarDiaria(_tarefa);
+            _db.TarefaDiarias.Add(_tarefa);
+            _db.SaveChanges();
             return Ok("tarefa criada");
         }
 
@@ -35,10 +47,12 @@ namespace TaksList.Controllers
                 previsaoConclusao = request.previsaoConclusao,
                 status = Enuns.StatusTarefa.EmAndamento,
                 conclusao = null,
-                inicio = DateTime.UtcNow
+                inicio = DateTime.UtcNow,
+                userId = request.userId
 
             };
-            AdicionarTarefa.AdicionarAgenda(_tarefa);
+            _db.TarefaAgendas.Add(_tarefa);
+            _db.SaveChanges();
             return Ok("tarefa criada");
         }
 
@@ -46,40 +60,34 @@ namespace TaksList.Controllers
 
         public IActionResult VerListaDiaria()
         {
-            var lerdiaria = GetTarefas.VerDiarias();
-            return Ok(lerdiaria);
+            var lista = _db.TarefaDiarias.ToList();
+            return Ok(lista);
         }
 
         [HttpGet("agenda")]
 
         public IActionResult VerListaAgenda()
         {
-            var leragenda = GetTarefas.VerAgendas();
-            return Ok(leragenda);
+            var lista = _db.TarefaAgendas.ToList();
+            return Ok(lista);
         }
 
         [HttpGet("diarias/{id}")]
 
         public IActionResult VerDiariaTarefa(int id)
         {
-            var lerdiaria = AdicionarTarefa.tarefaDiarias.FirstOrDefault(t => t.id == id);
-            if (lerdiaria == null)
-            {
-                return NotFound("Tarefa diária não encontrada.");
-            }
-            return Ok(lerdiaria);
+            var tarefa = _db.TarefaDiarias.Find(id);
+            if (tarefa == null) return NotFound("tarefa não encontrada");
+            return Ok(tarefa);
         }
 
         [HttpGet("agenda/{id}")]
 
         public IActionResult VerAgendaTarefa(int id)
         {
-            var leragenda = AdicionarTarefa.tarefaAgendas.FirstOrDefault(t => t.id == id);
-            if (leragenda == null)
-            {
-                return NotFound("Tarefa de agenda não encontrada.");
-            }
-            return Ok(leragenda);
+            var tarefa = _db.TarefaAgendas.Find(id);
+            if (tarefa == null)  return NotFound("Tarefa de agenda não encontrada.");            
+            return Ok(tarefa);
         }
 
 
@@ -87,12 +95,8 @@ namespace TaksList.Controllers
 
         public IActionResult AtualizarDiariaTarefa(int id, [FromBody] AttDiaria atualizar)
         {
-            var tarefa = AdicionarTarefa.tarefaDiarias.FirstOrDefault(t => t.id == id);
-            if (tarefa == null)
-            {
-                return NotFound("Tarefa diária não encontrada.");
-            }
-
+            var tarefa = _db.TarefaDiarias.Find(id);
+            if (tarefa == null) return NotFound("tarefa não encontrada");
             if (atualizar.dias != null)
             {
                 tarefa.dias = atualizar.dias;
@@ -101,6 +105,7 @@ namespace TaksList.Controllers
             {
                 tarefa.status = atualizar.status.Value;
             }
+            _db.SaveChanges();
             return Ok("Tarefa diária atualizada.");
         }
 
@@ -108,12 +113,7 @@ namespace TaksList.Controllers
 
         public IActionResult AtualizarAgendaTarefa(int id, [FromBody] AttAgenda atualizar)
         {
-            var tarefa = AdicionarTarefa.tarefaAgendas.FirstOrDefault(t => t.id == id);
-            if (tarefa == null)
-            {
-                return NotFound("Tarefa de agenda não encontrada.");
-            }
-
+            var tarefa = _db.TarefaAgendas.Find(id); if (tarefa == null) return NotFound("Tarefa de agenda não encontrada.");
             if (atualizar.status != null)
             {
                 tarefa.status = atualizar.status.Value;
@@ -126,6 +126,7 @@ namespace TaksList.Controllers
             {
                 tarefa.previsaoConclusao = atualizar.previsaoConclusao.Value;
             }
+            _db.SaveChanges();
 
             return Ok("Tarefa de agenda atualizada.");
 
@@ -136,27 +137,22 @@ namespace TaksList.Controllers
 
         public IActionResult DeletarDiariaTarefa(int id)
         {
-            var tarefa = AdicionarTarefa.tarefaDiarias.FirstOrDefault(t => t.id == id);
-            if (tarefa == null)
-            {
-                return NotFound("Tarefa diária não encontrada.");
-            }
-            AdicionarTarefa.tarefaDiarias.Remove(tarefa);
-            return Ok("Tarefa diária deletada.");
-
+          var tarefa = _db.TarefaDiarias.Remove(_db.TarefaDiarias.Find(id));
+            if (tarefa == null) return NotFound();
+            _db.SaveChanges();
+          return Ok("tarefa deletada");
         }
 
         [HttpDelete("agenda/{id}")]
 
         public IActionResult DeletarAgendaTarefa(int id)
         {
-            var tarefa = AdicionarTarefa.tarefaAgendas.FirstOrDefault(t => t.id == id);
-            if (tarefa == null)
-            {
-                return NotFound("Tarefa de agenda não encontrada.");
-            }
-            AdicionarTarefa.tarefaAgendas.Remove(tarefa);
-            return Ok("Tarefa de agenda deletada.");
+            var tarefa =_db.TarefaAgendas.Remove(_db.TarefaAgendas.Find(id));
+            if (tarefa == null) return NotFound();
+            _db.SaveChanges();
+            return Ok("tarefa deletada");
+
         }
+    }
 }
 

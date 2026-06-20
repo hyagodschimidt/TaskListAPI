@@ -1,13 +1,15 @@
 ﻿using TaksList.Enuns;
 
-namespace TaksList.Classes
+namespace TaksList.Models.Classes
 {
     public abstract class Tarefa
     {
-        public int id = 0;
+        public int id { get; set; } 
         public string title { get; set; }
-        public string description { get; set; }
+        public string? description { get; set; }
         public StatusTarefa status {  get; set; }
+        public int userId { get; set; }
+        public User User { get; set; }
     }
 
     public class TarefaDiaria : Tarefa

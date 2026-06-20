@@ -1,5 +1,5 @@
-﻿using TaksList.Classes;
-using TaksList.Enuns;
+﻿using TaksList.Enuns;
+using TaksList.Models.Classes;
 
 namespace TaksList.Services
 {
@@ -10,7 +10,7 @@ namespace TaksList.Services
 
         public TarefaAgenda AtualizarStatus(TarefaAgenda tarefa, StatusTarefa newstatus) 
         { 
-            tarefa.status= newstatus;
+            tarefa.status = newstatus;
 
             if(tarefa.status == StatusTarefa.Concluida)
             {
