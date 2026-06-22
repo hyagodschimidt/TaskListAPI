@@ -4,6 +4,6 @@
     {
         Ativa = 0,
         Pausada = 1,
-        Cancela = 2,
+        Cancelada = 2,
     }
 }

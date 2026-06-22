@@ -4,6 +4,7 @@ using TaksList.Models.Requests;
 using TaksList.Models.Classes;
 using Microsoft.EntityFrameworkCore;
 using TaksList.Validations.RequestValidations;
+using FluentValidation;
 
 namespace TaksList.Controllers
 {
@@ -13,9 +14,9 @@ namespace TaksList.Controllers
     public class UserController : ControllerBase
     {
         private readonly AppDbContext _db;
-        private readonly UserRequestValidator _validator;
+        private readonly IValidator<UserRequest> _validator;
 
-        public UserController(AppDbContext db, UserRequestValidator validator)
+        public UserController(AppDbContext db, IValidator<UserRequest> validator)
         {
             _db = db;
             _validator = validator;

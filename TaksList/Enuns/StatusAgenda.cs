@@ -2,8 +2,9 @@
 {
     public enum StatusAgenda
     {
-        Concluida = 0,
-        EmAndamento = 1,
+        
+        EmAndamento = 0,
+        Concluida = 1,
         Vencida = 2,
         Cancelada = 3,
     }
