@@ -6,6 +6,6 @@ namespace TaksList.Services
     {
         public List<DiasSemana>? dias { get; set; }
 
-        public StatusTarefa? status { get; set; }
+        public StatusDiaria? status { get; set; }
     }
 }

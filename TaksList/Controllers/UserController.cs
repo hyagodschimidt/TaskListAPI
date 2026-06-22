@@ -3,6 +3,7 @@ using TaksList.Data;
 using TaksList.Models.Requests;
 using TaksList.Models.Classes;
 using Microsoft.EntityFrameworkCore;
+using TaksList.Validations.RequestValidations;
 
 namespace TaksList.Controllers
 {
@@ -12,16 +13,23 @@ namespace TaksList.Controllers
     public class UserController : ControllerBase
     {
         private readonly AppDbContext _db;
+        private readonly UserRequestValidator _validator;
 
-        public UserController(AppDbContext db)
+        public UserController(AppDbContext db, UserRequestValidator validator)
         {
             _db = db;
+            _validator = validator;
         }
 
         [HttpPost]
 
         public IActionResult CreateUser([FromBody] UserRequest request)
         {
+            var result = _validator.Validate(request);
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors.Select(e => e.ErrorMessage));
+            }
             var _user = new User
             {
                 Name = request.Name,

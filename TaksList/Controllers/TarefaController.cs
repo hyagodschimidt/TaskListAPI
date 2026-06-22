@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using TaksList.Data;
 using TaksList.Models.Classes;
@@ -13,24 +14,33 @@ namespace TaksList.Controllers
     public class TarefaController : ControllerBase
     {
         private readonly AppDbContext _db;
+        private readonly IValidator<TarefaAgendaRequest> _agendaValidator;
+        private readonly IValidator<TarefaDiariaRequest> _diariaValidator;
 
-        public TarefaController(AppDbContext db)
+        public TarefaController(AppDbContext db, IValidator<TarefaDiariaRequest> diariaValidator, IValidator<TarefaAgendaRequest> agendaValidator)
         {
+
             _db = db;
+            _diariaValidator = diariaValidator;
+            _agendaValidator = agendaValidator;
         }
 
         [HttpPost("diarias")]
         public IActionResult CriaTarefa([FromBody] TarefaDiariaRequest request)
         {
+            var resultado = _diariaValidator.Validate(request);
+            if (!resultado.IsValid)        
+                return BadRequest(resultado.Errors.Select(e => e.ErrorMessage));       
             var _tarefa = new TarefaDiaria
+            
             {
                 title = request.title,
                 description = request.description,
                 dias = request.dias,
-                horario = request.horario,
-                status = Enuns.StatusTarefa.EmAndamento,
-                serId = request.userId
-            };
+                horario = request.horario != null ? TimeSpan.Parse(request.horario) : null,   
+                userId = request.userId
+            };                
+               
             _db.TarefaDiarias.Add(_tarefa);
             _db.SaveChanges();
             return Ok("tarefa criada");
@@ -40,12 +50,15 @@ namespace TaksList.Controllers
 
         public IActionResult CriaTarefaAgenda([FromBody] TarefaAgendaRequest request)
         {
+            var resultado = _agendaValidator.Validate(request);
+            if (!resultado.IsValid)
+                return BadRequest(resultado.Errors.Select(e => e.ErrorMessage));          
             var _tarefa = new TarefaAgenda
             {
                 title = request.title,
                 description = request.description,
                 previsaoConclusao = request.previsaoConclusao,
-                status = Enuns.StatusTarefa.EmAndamento,
+                status = Enuns.StatusAgenda.EmAndamento,
                 conclusao = null,
                 inicio = DateTime.UtcNow,
                 userId = request.userId
@@ -117,7 +130,7 @@ namespace TaksList.Controllers
             if (atualizar.status != null)
             {
                 tarefa.status = atualizar.status.Value;
-                if (tarefa.status == Enuns.StatusTarefa.Concluida)
+                if (tarefa.status == Enuns.StatusAgenda.Concluida)
                 {
                     tarefa.conclusao = DateTime.UtcNow;
                 }
