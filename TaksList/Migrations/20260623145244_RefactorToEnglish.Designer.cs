@@ -12,8 +12,8 @@ using TaksList.Data;
 namespace TaksList.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260622141141_SepareteStatusForTasks")]
-    partial class SepareteStatusForTasks
+    [Migration("20260623145244_RefactorToEnglish")]
+    partial class RefactorToEnglish
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,43 +25,6 @@ namespace TaksList.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("TaksList.Models.Classes.ScheduledTask", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CompleteAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("inicio")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DueDate")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ScheduledTasks");
-                });
-
             modelBuilder.Entity("TaksList.Models.Classes.RecurringTask", b =>
                 {
                     b.Property<int>("Id")
@@ -70,11 +33,11 @@ namespace TaksList.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.PrimitiveCollection<string>("Days")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<TimeSpan?>("Schedule")
@@ -95,6 +58,43 @@ namespace TaksList.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RecurringTasks");
+                });
+
+            modelBuilder.Entity("TaksList.Models.Classes.ScheduledTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompleteAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ScheduledTasks");
                 });
 
             modelBuilder.Entity("TaksList.Models.Classes.User", b =>
@@ -118,17 +118,6 @@ namespace TaksList.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TaksList.Models.Classes.ScheduledTask", b =>
-                {
-                    b.HasOne("TaksList.Models.Classes.User", "User")
-                        .WithMany("ScheduledTasks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TaksList.Models.Classes.RecurringTask", b =>
                 {
                     b.HasOne("TaksList.Models.Classes.User", "User")
@@ -140,11 +129,22 @@ namespace TaksList.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TaksList.Models.Classes.ScheduledTask", b =>
+                {
+                    b.HasOne("TaksList.Models.Classes.User", "User")
+                        .WithMany("ScheduledTasks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TaksList.Models.Classes.User", b =>
                 {
-                    b.Navigation("ScheduledTasks");
-
                     b.Navigation("RecurringTasks");
+
+                    b.Navigation("ScheduledTasks");
                 });
 #pragma warning restore 612, 618
         }

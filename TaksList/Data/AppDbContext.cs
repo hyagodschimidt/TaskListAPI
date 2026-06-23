@@ -7,9 +7,10 @@ namespace TaksList.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<TarefaAgenda> TarefaAgendas { get; set; }
-        public DbSet<TarefaDiaria> TarefaDiarias { get; set; }
+        public DbSet<ScheduledTask> ScheduledTasks { get; set; }
+        public DbSet<RecurringTask> RecurringTasks { get; set; }
         public DbSet<User> Users { get; set; }
 
     }
 }
+

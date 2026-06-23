@@ -1,15 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using TaksList.Data;
-using TaksList.Models.Requests;
-using TaksList.Models.Classes;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TaksList.Validations.RequestValidations;
-using FluentValidation;
+using TaksList.Data;
+using TaksList.Models.Classes;
+using TaksList.Models.Requests;
 
 namespace TaksList.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("users")]
 
     public class UserController : ControllerBase
     {
@@ -49,18 +48,18 @@ namespace TaksList.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{Id}")]
         public IActionResult GetUser(int id)
         {
             var user = _db.Users
-                .Include(u => u.TarefaDiarias)
-                .Include(u => u.TarefaAgendas)
+                .Include(u => u.RecurringTasks)
+                .Include(u => u.ScheduledTasks)
                 .FirstOrDefault(u => u.Id == id);
             if (user == null) return NotFound("Usuario não encontrado.");
             return Ok(user);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{Id}")]
         public IActionResult UpdateUser(int id, [FromBody] UserRequest request)
         {
             var user = _db.Users.Find(id);
@@ -72,7 +71,7 @@ namespace TaksList.Controllers
             return Ok("Usuario atualizado.");
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{Id}")]
         public IActionResult DeleteUser(int id)
         {
             var user = _db.Users.Find(id);

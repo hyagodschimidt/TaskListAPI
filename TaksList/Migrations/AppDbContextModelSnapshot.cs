@@ -22,76 +22,76 @@ namespace TaksList.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("TaksList.Models.Classes.TarefaAgenda", b =>
+            modelBuilder.Entity("TaksList.Models.Classes.RecurringTask", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("conclusao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("inicio")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("previsaoConclusao")
-                        .HasColumnType("int");
-
-                    b.Property<int>("status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("title")
+                    b.PrimitiveCollection<string>("Days")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("userId")
-                        .HasColumnType("int");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("userId");
-
-                    b.ToTable("TarefaAgendas");
-                });
-
-            modelBuilder.Entity("TaksList.Models.Classes.TarefaDiaria", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<string>("description")
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.PrimitiveCollection<string>("dias")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<TimeSpan?>("horario")
+                    b.Property<TimeSpan?>("Schedule")
                         .HasColumnType("time");
 
-                    b.Property<int>("status")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("title")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("userId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
-                    b.HasIndex("userId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("TarefaDiarias");
+                    b.ToTable("RecurringTasks");
+                });
+
+            modelBuilder.Entity("TaksList.Models.Classes.ScheduledTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompleteAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ScheduledTasks");
                 });
 
             modelBuilder.Entity("TaksList.Models.Classes.User", b =>
@@ -115,22 +115,22 @@ namespace TaksList.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TaksList.Models.Classes.TarefaAgenda", b =>
+            modelBuilder.Entity("TaksList.Models.Classes.RecurringTask", b =>
                 {
                     b.HasOne("TaksList.Models.Classes.User", "User")
-                        .WithMany("TarefaAgendas")
-                        .HasForeignKey("userId")
+                        .WithMany("RecurringTasks")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TaksList.Models.Classes.TarefaDiaria", b =>
+            modelBuilder.Entity("TaksList.Models.Classes.ScheduledTask", b =>
                 {
                     b.HasOne("TaksList.Models.Classes.User", "User")
-                        .WithMany("TarefaDiarias")
-                        .HasForeignKey("userId")
+                        .WithMany("ScheduledTasks")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -139,9 +139,9 @@ namespace TaksList.Migrations
 
             modelBuilder.Entity("TaksList.Models.Classes.User", b =>
                 {
-                    b.Navigation("TarefaAgendas");
+                    b.Navigation("RecurringTasks");
 
-                    b.Navigation("TarefaDiarias");
+                    b.Navigation("ScheduledTasks");
                 });
 #pragma warning restore 612, 618
         }

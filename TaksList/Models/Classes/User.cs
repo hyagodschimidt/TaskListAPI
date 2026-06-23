@@ -3,11 +3,10 @@
     public class User
     { 
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string PhoneNumber { get; set; }
-        
-        public List<TarefaAgenda> TarefaAgendas { get; set; }
+        public required string Name { get; set; }
+        public required string PhoneNumber { get; set; }
+        public List<ScheduledTask> ScheduledTasks { get; set; } = null!;
 
-        public List<TarefaDiaria> TarefaDiarias { get; set; }
+        public List<RecurringTask> RecurringTasks { get; set; } = null!;
     }
 }

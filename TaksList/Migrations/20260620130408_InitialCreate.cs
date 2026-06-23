@@ -26,7 +26,7 @@ namespace TaksList.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TarefaAgendas",
+                name: "ScheduledTasks",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
@@ -51,7 +51,7 @@ namespace TaksList.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TarefaDiarias",
+                name: "RecurringTasks",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
@@ -76,23 +76,23 @@ namespace TaksList.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_TarefaAgendas_userId",
-                table: "TarefaAgendas",
-                column: "userId");
+                table: "ScheduledTasks",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TarefaDiarias_userId",
-                table: "TarefaDiarias",
-                column: "userId");
+                table: "RecurringTasks",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "TarefaAgendas");
+                name: "ScheduledTasks");
 
             migrationBuilder.DropTable(
-                name: "TarefaDiarias");
+                name: "RecurringTasks");
 
             migrationBuilder.DropTable(
                 name: "Users");
