@@ -19,7 +19,7 @@ namespace TaksList.MiddleWare
             {
                 await _next(context);
             }
-            catch (ValidationException ex)
+            catch (RequestValidationException ex)
             {
                 _logger.LogWarning(ex, "Validação falhou");
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;

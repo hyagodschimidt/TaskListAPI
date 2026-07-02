@@ -6,6 +6,6 @@ namespace TaksList.Models.Requests
     {
         public List<WeekDays>? Days { get; set; }
 
-        public RecurringTaskStatus? Status { get; set; }
+        public string? Schedule { get; set; }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using FluentValidation;
-using System.Data;
 using TaksList.Data;
+using TaksList.Exceptions;
 using TaksList.Models.Classes;
 using TaksList.Models.Requests;
 using TaksList.Services.Interfaces;
-using TaksList.Exceptions;
 
 
 namespace TaksList.Services
@@ -15,20 +14,28 @@ namespace TaksList.Services
     {
         private readonly AppDbContext _db;
         private readonly IValidator<RecurringTaskRequest> _recurringTaskValidator;
+        private readonly IValidator<UpdateRecurringTaskRequest> _updateRecurringTaskValidator;
+        private readonly IValidator<ChangeRecurringTaskStatusRequest> _changeRecurringTaskStatusValidator;
 
-        public RecurringTaskService(AppDbContext db, IValidator<RecurringTaskRequest> recurringTaskValidator)
+        public RecurringTaskService
+        (AppDbContext db,
+        IValidator<RecurringTaskRequest> recurringTaskValidator,
+        IValidator<UpdateRecurringTaskRequest> updateRecurringTaskValidator,
+        IValidator<ChangeRecurringTaskStatusRequest> changeRecurringTaskStatusValidator)
+
         {
-
             _db = db;
             _recurringTaskValidator = recurringTaskValidator;
+            _updateRecurringTaskValidator = updateRecurringTaskValidator;
+            _changeRecurringTaskStatusValidator = changeRecurringTaskStatusValidator;
         }
         public void Create(RecurringTaskRequest request)
         {
-            var resultado = _recurringTaskValidator.Validate(request);
-            if (!resultado.IsValid)
-                throw new Exceptions.ValidationException(resultado.Errors);
+            var result = _recurringTaskValidator.Validate(request);
+            if (!result.IsValid)
+                throw new RequestValidationException(result.Errors);
 
-            var _tarefa = new RecurringTask
+            var task = new RecurringTask
 
             {
                 Title = request.Title,
@@ -38,46 +45,70 @@ namespace TaksList.Services
                 UserId = request.UserId
             };
 
-            _db.RecurringTasks.Add(_tarefa);
+            _db.RecurringTasks.Add(task);
             _db.SaveChanges();
         }
 
         public List<RecurringTask> GetAll()
         {
-            return _db.RecurringTasks.ToList();             
+            return _db.RecurringTasks.ToList();
         }
 
         public RecurringTask GetById(int id)
         {
             var task = _db.RecurringTasks.Find(id);
             if (task == null)
-                throw new Exceptions.BusinessException($"Tarefa recorrente com ID {id} não encontrada.");
+                throw new NotFoundException($"Tarefa recorrente com ID {id} não encontrada.");
             return task;
         }
 
         public void Update(int id, UpdateRecurringTaskRequest update)
         {
+
+            var result = _updateRecurringTaskValidator.Validate(update);
+
+            if (!result.IsValid)
+                throw new RequestValidationException(result.Errors);
+
             var task = _db.RecurringTasks.Find(id);
+
             if (task == null)
-                throw new Exceptions.BusinessException($"Tarefa recorrente com ID {id} não encontrada.");
+                throw new NotFoundException($"Tarefa recorrente com ID {id} não encontrada.");
+
             if (update.Days != null)
             {
                 task.Days = update.Days;
             }
-            if (update.Status != null)
+            if (update.Schedule != null)
             {
-                task.Status = update.Status.Value;
+                task.Schedule = TimeSpan.Parse(update.Schedule);
             }
+
             _db.SaveChanges();
-            
+
+        }
+
+        public void ChangeStatus(int id, ChangeRecurringTaskStatusRequest request)
+        {
+            var result = _changeRecurringTaskStatusValidator.Validate(request);
+            if (!result.IsValid)
+                throw new RequestValidationException(result.Errors);
+            var task = _db.RecurringTasks.Find(id);          
+            if (task == null)
+                throw new NotFoundException($"Tarefa recorrente com ID {id} não encontrada.");
+            if (request.Status == task.Status)
+                throw new BusinessException($"A tarefa recorrente com ID {id} já está com o status {request.Status}.");
+            task.Status = request.Status;
+            _db.SaveChanges();
         }
         public void Delete(int id)
         {
             var task = _db.RecurringTasks.Find(id);
-            if (task == null) ;
+            if (task == null)
+                throw new NotFoundException($"Tarefa recorrente com ID {id} não encontrada.");
             _db.RecurringTasks.Remove(task);
             _db.SaveChanges();
-           
+
         }
     }
 }

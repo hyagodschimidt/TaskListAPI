@@ -10,6 +10,7 @@ namespace TaksList.Services.Interfaces
             public List<RecurringTask> GetAll();
             public RecurringTask? GetById(int id);
             public void Update(int id, UpdateRecurringTaskRequest request);
+            public void ChangeStatus(int id, ChangeRecurringTaskStatusRequest request);
             public void Delete(int id);
     }
 }
