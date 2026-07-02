@@ -1,7 +1,10 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using TaksList.Data;
+using TaksList.Services;
+using TaksList.Services.Interfaces;
 using TaksList.Validations.RequestValidations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +16,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddValidatorsFromAssemblyContaining<TarefaAgendaRequestValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<TarefaDiariaRequestValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<UserRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateScheduledTaskRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRecurringTaskRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
+builder.Services.AddScoped<IRecurringTaskService, RecurringTaskService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -32,5 +36,5 @@ app.UseSwaggerUI(c =>
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.Run();

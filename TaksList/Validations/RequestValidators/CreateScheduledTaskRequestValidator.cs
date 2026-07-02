@@ -3,21 +3,17 @@ using TaksList.Models.Requests;
 
 namespace TaksList.Validations.RequestValidations
 {
-    public class TarefaDiariaRequestValidator : AbstractValidator<RecurringTaskRequest>
+    public class CreateScheduledTaskRequestValidator : AbstractValidator<ScheduledTaskRequest>
     {
-        public TarefaDiariaRequestValidator()
+        public CreateScheduledTaskRequestValidator()
         {
             RuleFor(x => x.Title)
                 .NotEmpty().WithMessage("O título é obrigatório.")
                 .MaximumLength(50).WithMessage("O título não pode exceder 50 caracteres.");
             RuleFor(x => x.Description)
                 .MaximumLength(500).WithMessage("A descrição deve ter no máximo 500 caracteres");
-            RuleFor(x => x.Days)
-                .NotEmpty().WithMessage("O campo 'Days' é obrigatório.");
-            RuleFor(x => x.Schedule)
-                .Must(h => h == null || TimeSpan.TryParse(h, out _))
-                .WithMessage("Horário inválido. Use o formato HH:mm ou (ex: 08:30 ou 15:00:00).");
-
+            RuleFor(x => x.DueDate).NotNull().WithMessage("O campo 'data de vencimento' é obrigatório.")
+                .GreaterThan(DateTime.UtcNow).WithMessage("A data de vencimento deve ser uma data futura.");
         }
     }
 }

@@ -1,8 +1,11 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks.Dataflow;
 using TaksList.Data;
 using TaksList.Models.Classes;
 using TaksList.Models.Requests;
+using TaksList.Services;
+using TaksList.Services.Interfaces;
 
 namespace TaksList.Controllers
 {
@@ -14,10 +17,11 @@ namespace TaksList.Controllers
     {
         private readonly AppDbContext _db;
         private readonly IValidator<RecurringTaskRequest> _recurringTaskValidator;
+        private readonly RecurringTaskService _service;
 
         public RecurringTaskController(AppDbContext db, IValidator<RecurringTaskRequest> recurringTaskValidator)
         {
-
+            _service = new RecurringTaskService(db, recurringTaskValidator);
             _db = db;
             _recurringTaskValidator = recurringTaskValidator;
         }
@@ -25,21 +29,7 @@ namespace TaksList.Controllers
         [HttpPost]
         public IActionResult Create([FromBody] RecurringTaskRequest request)
         {
-            var resultado = _recurringTaskValidator.Validate(request);
-            if (!resultado.IsValid)
-                return BadRequest(resultado.Errors.Select(e => e.ErrorMessage));
-            var _tarefa = new RecurringTask
-
-            {
-                Title = request.Title,
-                Description = request.Description,
-                Days = request.Days,
-                Schedule = request.Schedule != null ? TimeSpan.Parse(request.Schedule) : null,
-                UserId = request.UserId
-            };
-
-            _db.RecurringTasks.Add(_tarefa);
-            _db.SaveChanges();
+            _service.Create(request);
             return Ok("tarefa criada");
         }
 

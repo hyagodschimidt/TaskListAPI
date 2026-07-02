@@ -18,6 +18,8 @@ namespace TaksList.Models.Classes
         public TimeSpan? Schedule { get; set; }
 
         public RecurringTaskStatus Status { get; set; }
+
+      
     }
 
     public class ScheduledTask : AppTask

@@ -3,9 +3,9 @@ using TaksList.Models.Requests;
 
 namespace TaksList.Validations.RequestValidations
 {
-    public class UserRequestValidator : AbstractValidator<UserRequest>
+    public class CreateUserRequestValidator : AbstractValidator<UserRequest>
     {
-        public UserRequestValidator() 
+        public CreateUserRequestValidator() 
         {
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("O nome é obrigatório.")
@@ -17,3 +17,4 @@ namespace TaksList.Validations.RequestValidations
         }
     }
 }
+ 
